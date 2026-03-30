@@ -4,6 +4,7 @@ mod app;
 mod cli;
 mod markdown;
 mod translator;
+mod app_settings;
 
 fn main() {
     if let Err(error) = run() {
@@ -13,10 +14,11 @@ fn main() {
 }
 
 fn run() -> anyhow::Result<()> {
-    let config = cli::parse_args(std::env::args())?;
+    let app_config = app_settings::AppConfig::load()?;
+    let run_settings = cli::parse_args()?;
 
     // Placeholder type to keep module wiring in place while implementations are pending.
     let translator = translator::AzureTranslator;
 
-    app::run(config, &translator)
+    app::run(app_config, run_settings, &translator)
 }
