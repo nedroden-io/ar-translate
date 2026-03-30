@@ -1,23 +1,22 @@
-use std::env;
-use std::path::PathBuf;
 use std::process;
 
+mod app;
+mod cli;
+mod markdown;
+mod translator;
+
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    if args.len() < 2 {
-        eprintln!("Usage: {} <target-path>", args[0]);
+    if let Err(error) = run() {
+        eprintln!("Error: {error:#}");
         process::exit(1);
     }
+}
 
-    let target_path = PathBuf::from(&args[1]);
+fn run() -> anyhow::Result<()> {
+    let config = cli::parse_args(std::env::args())?;
 
-    if !target_path.exists() {
-        eprintln!("Error: Path '{}' does not exist", target_path.display());
-        process::exit(1);
-    }
+    // Placeholder type to keep module wiring in place while implementations are pending.
+    let translator = translator::AzureTranslator;
 
-    println!("Target path: {}", target_path.display());
-    
-    // TODO: Implement translation logic here
+    app::run(config, &translator)
 }
