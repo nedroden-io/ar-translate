@@ -7,8 +7,9 @@ pub trait MarkdownTranslator {
 pub struct AzureTranslator;
 
 impl MarkdownTranslator for AzureTranslator {
-    fn translate_markdown(&self, input: &str, _target_language: &str) -> Result<String> {
+    fn translate_markdown(&self, input: &str, target_language: &str) -> Result<String> {
         let _ = input;
-        todo!("Implement markdown translation")
+
+        Ok(format!("Translating '{input}' to '{target_language}'"))
     }
 }
