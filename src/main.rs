@@ -5,6 +5,7 @@ mod cli;
 mod markdown;
 mod translator;
 mod app_settings;
+mod azure;
 
 fn main() {
     if let Err(error) = run() {
@@ -20,5 +21,5 @@ fn run() -> anyhow::Result<()> {
     // Placeholder type to keep module wiring in place while implementations are pending.
     let translator = translator::AzureTranslator;
 
-    app::run(app_config, run_settings, &translator)
+    app::run(run_settings, &translator)
 }
