@@ -1,4 +1,5 @@
 use std::process;
+use crate::azure::AzureClient;
 
 mod app;
 mod cli;
@@ -18,8 +19,13 @@ fn run() -> anyhow::Result<()> {
     let app_config = app_settings::AppConfig::load()?;
     let run_settings = cli::parse_args()?;
 
+    let azure_client = AzureClient::new(
+        app_config.azure_api_key,
+        app_config.azure_api_region
+    );
+
     // Placeholder type to keep module wiring in place while implementations are pending.
-    let translator = translator::AzureTranslator;
+    let translator = translator::AzureTranslator::new(&azure_client);
 
     app::run(run_settings, &translator)
 }

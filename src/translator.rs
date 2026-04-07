@@ -1,12 +1,21 @@
 use anyhow::Result;
+use crate::azure::AzureClient;
 
 pub trait MarkdownTranslator {
     fn translate_markdown(&self, input: &str, target_language: &str) -> Result<String>;
 }
 
-pub struct AzureTranslator;
+pub struct AzureTranslator<'a> {
+    azure_client: &'a AzureClient
+}
 
-impl MarkdownTranslator for AzureTranslator {
+impl <'a> AzureTranslator<'a> {
+    pub fn new(azure_client: &'a AzureClient) -> AzureTranslator<'a> {
+        Self { azure_client }
+    }
+}
+
+impl <'a> MarkdownTranslator for AzureTranslator<'a> {
     fn translate_markdown(&self, input: &str, target_language: &str) -> Result<String> {
         let _ = input;
 

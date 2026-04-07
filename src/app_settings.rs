@@ -2,8 +2,8 @@ use anyhow::{Context, Result};
 
 #[derive(Debug, Clone)]
 pub struct AppConfig {
-    azure_api_key: String,
-    azure_api_region: String,
+    pub azure_api_key: String,
+    pub azure_api_region: String,
 }
 
 impl AppConfig {
