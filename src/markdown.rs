@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
-use walkdir::{WalkDir, DirEntry};
+use walkdir::{DirEntry, WalkDir};
 
 pub fn collect_markdown_files(target_path: &Path) -> Result<Vec<PathBuf>> {
     let paths = WalkDir::new(target_path)

@@ -1,5 +1,5 @@
-use std::path::PathBuf;
 use clap::Parser;
+use std::path::PathBuf;
 
 use anyhow::Result;
 
@@ -16,4 +16,3 @@ pub struct RunConfig {
 pub fn parse_args() -> Result<RunConfig> {
     Ok(RunConfig::parse())
 }
-
