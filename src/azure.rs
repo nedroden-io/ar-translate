@@ -1,5 +1,5 @@
 use crate::app_settings::AppConfig;
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 
 pub struct AzureClient {
     api_key: String,
@@ -39,7 +39,10 @@ impl AzureClient {
             .await?;
 
         if !response.status().is_success() {
-            return Err(anyhow!("Azure API request failed with status: {}", response.status()));
+            return Err(anyhow!(
+                "Azure API request failed with status: {}",
+                response.status()
+            ));
         }
 
         Ok(response.json().await?)

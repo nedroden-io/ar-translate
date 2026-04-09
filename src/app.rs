@@ -16,7 +16,9 @@ pub async fn run(config: RunConfig, translator: &impl MarkdownTranslator) -> Res
                 target_language
             );
 
-            let translation = translator.translate_markdown(&content, target_language).await?;
+            let translation = translator
+                .translate_markdown(&content, target_language)
+                .await?;
             markdown::save_translated_file(file.as_path(), translation.as_str(), target_language)?;
         }
     }
