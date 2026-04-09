@@ -1,5 +1,5 @@
 use crate::app_settings::AppConfig;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 
 pub struct AzureClient {
     api_key: String,
@@ -22,12 +22,26 @@ impl AzureClient {
             http_client: reqwest::Client::new(),
         }
     }
-}
 
-pub async fn perform_azure_request<T: serde::de::DeserializeOwned>(
-    app_config: &AppConfig,
-    url: &str,
-    body: &str,
-) -> Result<T> {
-    todo!("Implement this stuff")
+    pub async fn send_request<T: serde::de::DeserializeOwned>(
+        &self,
+        url: impl Into<String>,
+        body: impl Into<String>,
+    ) -> Result<T> {
+        let response = self
+            .http_client
+            .post(url.into())
+            .header("Ocp-Apim-Subscription-Key", &self.api_key)
+            .header("Ocp-Apim-Subscription-Region", &self.api_region)
+            .header("Content-Type", "application/json")
+            .body(body.into())
+            .send()
+            .await?;
+
+        if !response.status().is_success() {
+            return Err(anyhow!("Azure API request failed with status: {}", response.status()));
+        }
+
+        Ok(response.json::<T>().await?)
+    }
 }

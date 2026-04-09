@@ -7,7 +7,7 @@ pub fn collect_markdown_files(target_path: &Path) -> Result<Vec<PathBuf>> {
     let paths = WalkDir::new(target_path)
         .into_iter()
         .filter_map(|e| e.ok())
-        .filter(|e| is_markdown_file(e))
+        .filter(is_markdown_file)
         .map(|e| e.path().to_path_buf())
         .collect::<Vec<_>>();
 
