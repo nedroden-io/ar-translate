@@ -15,7 +15,30 @@ pub fn collect_markdown_files(target_path: &Path) -> Result<Vec<PathBuf>> {
 }
 
 pub fn is_markdown_file(path: &DirEntry) -> bool {
-    path.file_type().is_file() && path.file_name().to_string_lossy().ends_with(".md")
+    if !path.file_type().is_file() {
+        return false;
+    }
+
+    let file_name = path.file_name().to_string_lossy();
+    if !file_name.to_ascii_lowercase().ends_with(".md") {
+        return false;
+    }
+
+    let stem = path
+        .path()
+        .file_stem()
+        .and_then(|value| value.to_str())
+        .unwrap_or_default();
+
+    !has_two_letter_language_suffix(stem)
+}
+
+fn has_two_letter_language_suffix(stem: &str) -> bool {
+    let Some((_, suffix)) = stem.rsplit_once('-') else {
+        return false;
+    };
+
+    suffix.len() == 2 && suffix.chars().all(|c| c.is_ascii_alphabetic())
 }
 
 pub fn save_translated_file(path: &Path, body: &str, target_language: &str) -> Result<()> {
