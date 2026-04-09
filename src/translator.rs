@@ -6,7 +6,7 @@ pub trait MarkdownTranslator {
 }
 
 pub struct AzureTranslator<'a> {
-    azure_client: &'a AzureClient,
+    azure_client: &'a AzureClient<'a>,
 }
 
 impl<'a> AzureTranslator<'a> {
@@ -43,8 +43,7 @@ impl<'a> MarkdownTranslator for AzureTranslator<'a> {
     async fn translate_markdown(&self, input: &str, target_language: &str) -> Result<String> {
         let response = self
             .azure_client
-            .send_request::<Vec<TranslateResponse>>(
-                format!("/translate?api-version=3.0&to={}", target_language),
+            .send_openai_request::<Vec<TranslateResponse>>(
                 &[TranslateRequest {
                     text: input.to_string(),
                 }],

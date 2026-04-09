@@ -1,38 +1,34 @@
 use crate::app_settings::AppConfig;
 use anyhow::{Result, anyhow};
 
-pub struct AzureClient {
-    api_key: String,
-    api_region: String,
-    api_endpoint: String,
+pub struct AzureClient<'a> {
+    api_config: &'a AppConfig,
 
     http_client: reqwest::Client,
 }
 
-impl AzureClient {
-    pub fn new(
-        api_key: impl Into<String>,
-        api_region: impl Into<String>,
-        api_endpoint: impl Into<String>,
-    ) -> Self {
+impl<'a> AzureClient<'a> {
+    pub fn new(api_config: &'a AppConfig) -> Self {
         Self {
-            api_key: api_key.into(),
-            api_region: api_region.into(),
-            api_endpoint: api_endpoint.into(),
+            api_config,
             http_client: reqwest::Client::new(),
         }
     }
 
-    pub async fn send_request<T: serde::de::DeserializeOwned>(
+    pub async fn send_openai_request<T: serde::de::DeserializeOwned>(
         &self,
-        url: impl Into<String>,
         body: &impl serde::Serialize,
     ) -> Result<T> {
+        let target_url = format!("{}/openai/deployments/{}/chat/completions?api-version={}",
+                                 self.api_config.azure_api_endpoint,
+                                 self.api_config.azure_api_deployment,
+                                 self.api_config.azure_api_version);
+
         let response = self
             .http_client
-            .post(format!("{}/{}", self.api_endpoint, url.into()))
-            .header("Ocp-Apim-Subscription-Key", &self.api_key)
-            .header("Ocp-Apim-Subscription-Region", &self.api_region)
+            .post(target_url)
+            .header("Ocp-Apim-Subscription-Key", &self.api_config.azure_api_key)
+            .header("Ocp-Apim-Subscription-Region", &self.api_config.azure_api_region)
             .header("Content-Type", "application/json")
             .json(body)
             .send()
