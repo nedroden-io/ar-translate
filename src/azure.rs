@@ -27,8 +27,7 @@ impl<'a> AzureClient<'a> {
         let response = self
             .http_client
             .post(target_url)
-            .header("Ocp-Apim-Subscription-Key", &self.api_config.azure_api_key)
-            .header("Ocp-Apim-Subscription-Region", &self.api_config.azure_api_region)
+            .bearer_auth(&self.api_config.azure_api_key)
             .header("Content-Type", "application/json")
             .json(body)
             .send()
@@ -41,6 +40,6 @@ impl<'a> AzureClient<'a> {
             ));
         }
 
-        Ok(response.json().await?)
+        Ok(response.json::<T>().await?)
     }
 }

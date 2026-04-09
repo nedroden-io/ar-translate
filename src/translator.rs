@@ -1,5 +1,6 @@
 use crate::azure::AzureClient;
 use anyhow::Result;
+use serde::{Deserialize, Serialize};
 
 pub trait MarkdownTranslator {
     async fn translate_markdown(&self, input: &str, target_language: &str) -> Result<String>;
@@ -15,52 +16,63 @@ impl<'a> AzureTranslator<'a> {
     }
 }
 
-#[derive(serde::Serialize)]
-struct TranslateRequest {
-    text: String,
-}
-
-#[derive(serde::Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct TranslateResponse {
-    detected_language: DetectedLanguage,
-    translations: Vec<Translation>,
-}
-
-#[derive(serde::Deserialize)]
-struct Translation {
-    text: String,
-    to: String,
-}
-
-#[derive(serde::Deserialize)]
-struct DetectedLanguage {
-    language: String,
-    score: f32,
-}
-
 impl<'a> MarkdownTranslator for AzureTranslator<'a> {
     async fn translate_markdown(&self, input: &str, target_language: &str) -> Result<String> {
         let response = self
             .azure_client
-            .send_openai_request::<Vec<TranslateResponse>>(
-                &[TranslateRequest {
-                    text: input.to_string(),
-                }],
+            .send_openai_request::<OpenAiResponse>(
+                &OpenAiRequest {
+                    messages: vec![Message {
+                        role: String::from("user"),
+                        content: String::from("Tell me a joke"),
+                        //content: input.to_string()
+                    }],
+                    max_tokens: 4096,
+                    temperature: 0,
+                    top_p: 1,
+                    model: "gpt-4o".to_string(),
+                },
             )
             .await?;
 
-        let default = &Translation {
-            text: "???".to_string(),
-            to: target_language.to_string(),
-        };
-        let translation = response
+        let translation = &response
+            .choices
             .first()
             .unwrap()
-            .translations
-            .first()
-            .unwrap_or(default);
+            .message
+            .content;
 
-        Ok(translation.text.clone())
+        Ok(translation.clone())
     }
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+struct OpenAiRequest {
+    pub messages: Vec<Message>,
+    pub max_tokens: i64,
+    pub temperature: i64,
+    pub top_p: i64,
+    pub model: String,
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+struct Message {
+    pub role: String,
+    pub content: String,
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+struct OpenAiCompletion {
+    pub content: String,
+    pub role: String,
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+struct Choice {
+    pub index: i64,
+    pub message: OpenAiCompletion,
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+struct OpenAiResponse {
+    pub choices: Vec<Choice>,
 }

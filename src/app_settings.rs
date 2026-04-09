@@ -24,8 +24,8 @@ impl AppConfig {
         let api_version = std::env::var("AR_TRANSLATE_AZURE_API_VERSION")
             .context("Failed to load API version from environment variable 'AR_TRANSLATE_AZURE_API_VERSION'")?;
 
-        let deployment = std::env::var("AR_TRANSLATE_DEPLOYMENT_NAME")
-            .context("Failed to load deployment name from environment variable 'AR_TRANSLATE_DEPLOYMENT_NAME'")?;
+        let deployment = std::env::var("AR_TRANSLATE_AZURE_API_DEPLOYMENT_NAME")
+            .context("Failed to load deployment name from environment variable 'AR_TRANSLATE_AZURE_API_DEPLOYMENT_NAME'")?;
 
         Ok(Self {
             azure_api_key: api_key,
