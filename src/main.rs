@@ -8,14 +8,15 @@ mod cli;
 mod markdown;
 mod translator;
 
-fn main() {
-    if let Err(error) = run() {
+#[tokio::main]
+async fn main() {
+    if let Err(error) = run().await {
         eprintln!("Error: {error:#}");
         process::exit(1);
     }
 }
 
-fn run() -> anyhow::Result<()> {
+async fn run() -> anyhow::Result<()> {
     let app_config = app_settings::AppConfig::load()?;
     let run_settings = cli::parse_args()?;
 
@@ -28,5 +29,5 @@ fn run() -> anyhow::Result<()> {
     // Placeholder type to keep module wiring in place while implementations are pending.
     let translator = translator::AzureTranslator::new(&azure_client);
 
-    app::run(run_settings, &translator)
+    app::run(run_settings, &translator).await
 }

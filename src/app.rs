@@ -3,7 +3,7 @@ use crate::markdown;
 use crate::translator::MarkdownTranslator;
 use anyhow::Result;
 
-pub fn run(config: RunConfig, translator: &impl MarkdownTranslator) -> Result<()> {
+pub async fn run(config: RunConfig, translator: &impl MarkdownTranslator) -> Result<()> {
     let markdown_files = markdown::collect_markdown_files(&config.target_path)?;
 
     for file in markdown_files {
@@ -16,8 +16,8 @@ pub fn run(config: RunConfig, translator: &impl MarkdownTranslator) -> Result<()
                 target_language
             );
 
-            let _ = translator.translate_markdown(&content, target_language)?;
-            //println!("{}", translation);
+            let translation = translator.translate_markdown(&content, target_language).await?;
+            markdown::save_translated_file(file.as_path(), translation.as_str(), target_language)?;
         }
     }
 

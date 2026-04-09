@@ -26,15 +26,15 @@ impl AzureClient {
     pub async fn send_request<T: serde::de::DeserializeOwned>(
         &self,
         url: impl Into<String>,
-        body: impl Into<String>,
+        body: &impl serde::Serialize,
     ) -> Result<T> {
         let response = self
             .http_client
-            .post(url.into())
+            .post(format!("{}/{}", self.api_endpoint, url.into()))
             .header("Ocp-Apim-Subscription-Key", &self.api_key)
             .header("Ocp-Apim-Subscription-Region", &self.api_region)
             .header("Content-Type", "application/json")
-            .body(body.into())
+            .json(body)
             .send()
             .await?;
 
@@ -42,6 +42,6 @@ impl AzureClient {
             return Err(anyhow!("Azure API request failed with status: {}", response.status()));
         }
 
-        Ok(response.json::<T>().await?)
+        Ok(response.json().await?)
     }
 }
