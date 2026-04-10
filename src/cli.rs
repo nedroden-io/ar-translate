@@ -11,6 +11,9 @@ pub struct RunConfig {
 
     #[arg(short, long, required = true, value_delimiter = ',')]
     pub languages: Vec<String>,
+
+    #[arg(short, long, required = false)]
+    pub max_depth: Option<usize>,
 }
 
 pub fn parse_args() -> Result<RunConfig> {

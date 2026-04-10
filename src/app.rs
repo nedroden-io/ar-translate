@@ -4,7 +4,7 @@ use crate::translator::MarkdownTranslator;
 use anyhow::Result;
 
 pub async fn run(config: RunConfig, translator: &impl MarkdownTranslator) -> Result<()> {
-    let markdown_files = markdown::collect_markdown_files(&config.target_path)?;
+    let markdown_files = markdown::collect_markdown_files(&config.target_path, config.max_depth.unwrap_or(usize::MAX))?;
 
     for file in markdown_files {
         let content = std::fs::read_to_string(&file)?;

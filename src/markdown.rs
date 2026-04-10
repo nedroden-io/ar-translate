@@ -3,8 +3,9 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use walkdir::{DirEntry, WalkDir};
 
-pub fn collect_markdown_files(target_path: &Path) -> Result<Vec<PathBuf>> {
+pub fn collect_markdown_files(target_path: &Path, max_depth: usize) -> Result<Vec<PathBuf>> {
     let paths = WalkDir::new(target_path)
+        .max_depth(max_depth)
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(is_markdown_file)
