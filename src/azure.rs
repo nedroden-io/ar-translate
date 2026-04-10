@@ -19,10 +19,12 @@ impl<'a> AzureClient<'a> {
         &self,
         body: &impl serde::Serialize,
     ) -> Result<T> {
-        let target_url = format!("{}/openai/deployments/{}/chat/completions?api-version={}",
-                                 self.api_config.azure_api_endpoint,
-                                 self.api_config.azure_api_deployment,
-                                 self.api_config.azure_api_version);
+        let target_url = format!(
+            "{}/openai/deployments/{}/chat/completions?api-version={}",
+            self.api_config.azure_api_endpoint,
+            self.api_config.azure_api_deployment,
+            self.api_config.azure_api_version
+        );
 
         let response = self
             .http_client

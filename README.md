@@ -5,11 +5,11 @@ CLI tool to recursively translate Markdown files in a target path.
 ## Usage
 
 ```bash
-cargo run -- <target-path> <target-language>
+ar-translate --target-path <target-path> --target-language <target-language>
 ```
 
 Examples:
 
 ```bash
-cargo run -- ./docs es
+ar-translate --target-path ./docs --target-language de,es,fr
 ```

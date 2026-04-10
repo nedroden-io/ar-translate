@@ -22,11 +22,16 @@ impl<'a> MarkdownTranslator for AzureTranslator<'a> {
             .azure_client
             .send_openai_request::<OpenAiResponse>(
                 &OpenAiRequest {
-                    messages: vec![Message {
-                        role: String::from("user"),
-                        content: String::from("Tell me a joke"),
-                        //content: input.to_string()
-                    }],
+                    messages: vec![
+                        Message {
+                            role: String::from("system"),
+                            content: String::from(format!("Translate the following markdown content to the target language ({}), preserving all markdown formatting and structure. Only provide the translated markdown content without any additional explanations or comments. Do not wrap it in a code block either.", target_language)),
+                        },
+                        Message {
+                            role: String::from("user"),
+                            content: input.to_string()
+                        }
+                    ],
                     max_tokens: 4096,
                     temperature: 0,
                     top_p: 1,
@@ -35,12 +40,7 @@ impl<'a> MarkdownTranslator for AzureTranslator<'a> {
             )
             .await?;
 
-        let translation = &response
-            .choices
-            .first()
-            .unwrap()
-            .message
-            .content;
+        let translation = &response.choices.first().unwrap().message.content;
 
         Ok(translation.clone())
     }
